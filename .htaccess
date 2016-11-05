@@ -1,0 +1,34 @@
+Options +FollowSymLinks
+
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteBase /expo
+
+	<Files .*>
+		Order Deny,Allow
+		Deny From All
+	</Files>
+
+	# Allow asset folders through
+	RewriteRule ^(modules/(.+)?/assets/(.+)) - [L]
+
+	# Protect application and system files from being viewed
+	RewriteRule ^(system/.+|modules/.+|application/.+) - [F,L]
+
+
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+
+	RewriteRule .* index.php/$1 [L]
+
+	# For dynamic subdomain
+	RewriteRule ^([aA-zZ])$ index.php?username=$1
+	RewriteCond %{HTTP_HOST} ^(^.*)\.getcentreapp.com
+	#RewriteRule (.*) index.php?username=%1
+	
+	# Prevents access to dot files (.git, .htaccess) - security.
+	RewriteCond %{SCRIPT_FILENAME} -d
+	RewriteCond %{SCRIPT_FILENAME} -f
+	RewriteRule "(^|/)\." - [F]
+	
+</IfModule>
